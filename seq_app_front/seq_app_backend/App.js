@@ -7,7 +7,7 @@ const port = process.env.PORT || 4002;
 const app = express();
 app.use(index);
 const server = http.createServer(app);
-const server_path = "amqp://guest:123456789@localhost";
+const server_path = "amqp://localhost";
 
 app.use(express.static("dist"));
 //Global variables where are stored informations about the messaging server and the channel
