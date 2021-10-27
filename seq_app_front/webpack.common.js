@@ -48,6 +48,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       title: 'Production-SeqApp',
+      template: './public/index.html'
     }),
   ],
 };
