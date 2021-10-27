@@ -30,7 +30,7 @@ export default function Launch(){
   };
 
   const handleChangeId = (event) => {
-    let val = Array.from(event.target.selectedOptions , option => option.value);
+    let val = Array.from(event.target.selectedOptions , option => parseInt(option.value));
     setId(val);
   };
 
@@ -40,7 +40,7 @@ export default function Launch(){
   };
 
   const handleChangeLocationId = (event) => {
-    let val = Array.from(event.target.selectedOptions , option => option.value);
+    let val = Array.from(event.target.selectedOptions , option => parseInt(option.value));
     setLocationId(val);
   };
 
