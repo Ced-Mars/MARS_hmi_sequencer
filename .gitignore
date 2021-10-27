@@ -1,0 +1,7 @@
+# dependencies
+/seq_app_backend/node_modules
+/seq_app_front/node_modules
+/seq_app_backend/.env
+/seq_app_front/.env
+/seq_app_backend/dist
+/seq_app_front/dist
