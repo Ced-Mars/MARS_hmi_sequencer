@@ -49,7 +49,7 @@ function main(){
                   throw error1;
                 }
                 channel = chan;
-                var exchange = 'seq_exchange';
+                var exchange = 'sequencer';
                 var key = 'action.cmd';
             
                 channel.assertExchange(exchange, 'topic', {
