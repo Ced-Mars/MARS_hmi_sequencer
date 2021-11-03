@@ -75,7 +75,7 @@ function main(){
 
           socket.on("2Seq", (a) => {
             console.log("2Seq", a);
-            //channel.publish(exchange, key2, Buffer.from(JSON.stringify(a)));
+            channel.publish(exchange, key2, Buffer.from(JSON.stringify(a)));
           });
 
           //Called when the client disconnect from the socketio link
