@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Button from '@mui/material/Button';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Stack, Paper, Alert } from "@mui/material";
-import { styled } from '@mui/material/styles';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Stack, Alert } from "@mui/material";
 
 import socketIOClient from "socket.io-client";
+
+const ENDPOINT = "http://127.0.0.1:4002";
+const socket = socketIOClient(ENDPOINT);
 
 export default function Dialogue(){
     const root = {
@@ -13,12 +15,9 @@ export default function Dialogue(){
         flexDirection: "column",
     };
     const blocStack = {
-        display:"flex",
-        flexDirection:"column",
-        alignContent:"stretch",
         margin: "5px",
         padding:"10px",
-        flex: "3",
+        flex: "1",
         overflow:"auto",
         border:"solid"
     };
@@ -33,7 +32,8 @@ export default function Dialogue(){
 
     const [open, setOpen] = React.useState(false);
     const [actionRequested, setActionRequested] = React.useState(false);
-    const [stack, setStack] = React.useState(["item"]);
+    const [stack, setStack] = React.useState([]);
+    const [action, setAction] = React.useState({});
 
 
     const handleClose = () => {
@@ -41,14 +41,25 @@ export default function Dialogue(){
     };
 
     const handleMoreStack = () => {
-        setStack([...stack, "id"]);
+        setStack([...stack, action]);
         setActionRequested(false);
+        socket.emit("2Seq", "action finie");
     };
 
     const handleActionRequested = () => {
         setActionRequested(true);
         setOpen(true);
     };
+
+    useEffect(() => {
+        socket.on("AlertSeq", (a) => {
+            console.log("inside alert seq useeffect");
+            setAction(a);
+            handleActionRequested();
+        });
+        // CLEAN UP THE EFFECT
+        return () => socket.disconnect();
+      }, [socket]);
     
     return(
         <div style={root}>
@@ -61,7 +72,7 @@ export default function Dialogue(){
                 >
                     {stack.map((item, id) => {
                         return(  
-                            <Alert severity="success">Alert {id}</Alert>   
+                            <Alert severity="success">Action {id} - {item["description"]}</Alert>   
                         );
                     })}
 
@@ -69,16 +80,13 @@ export default function Dialogue(){
             </div>
             {!actionRequested ?
             <div style={blocInfo}>
-                <Button onClick={handleActionRequested}>
-                    Simuler Action demandée
-                </Button>
                 <Alert severity="info">Aucune Action demandée pour le moment</Alert>
                 
             </div> 
             : 
             <div style={blocInfo}>
                 
-                <Alert severity="warning">Action demandée, veuillez valider une fois l'action executée</Alert>
+                <Alert severity="warning">Action demandée - {action["description"]}</Alert>
                 <Button onClick={handleMoreStack}>
                     Valider
                 </Button>
