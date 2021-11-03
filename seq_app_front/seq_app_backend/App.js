@@ -26,10 +26,12 @@ main();
 
 //Calling main function in socketio-connection.js
 function main(){
+  var stack = [];
   var exchange = 'sequencer';
   var key = 'action.cmd';
   var key2 = 'action.toseq';
   var key3 = 'action.touser';
+  var key4 = 'buildp.reset';
   //Connexion to rabbitMQ server
   try {
     //Creating connection with rabbitMQ server
@@ -45,17 +47,24 @@ function main(){
           durable: false
         });
 
-        channel.assertQueue('', {
+        channel.assertQueue('', { exclusive: true
         }, function(error2, q) {
           if (error2) {
             throw error2;
           }
           console.log(' [*] Waiting for user actions');
           channel.bindQueue(q.queue, exchange, key3);
+          channel.bindQueue(q.queue, exchange, key4);
           channel.consume(q.queue, function(msg) {
-            console.log("USER ACTION : ", msg.content.toString());
-            console.log("Client is connected - Inside User Action Channel consume");
-            socket.emit("AlertSeq", JSON.parse(msg.content));
+            
+            if(msg.fields.routingKey == key3){
+              console.log("USER ACTION : ", msg.content.toString());
+              console.log("Client is connected - Inside User Action Channel consume");
+              socket.emit("AlertSeq", JSON.parse(msg.content));
+            }else if (msg.fields.routingKey == key4){
+              stack = [];
+              socket.emit("StackGestion", stack);
+            }
           }, {
             noAck: true
           });
@@ -66,6 +75,7 @@ function main(){
         const socket = io.on("connection", (socket) => {
           console.log("Client is connected");
           socket.emit("FromSeq", message);
+          socket.emit("StackGestion", stack);
           console.log("emitted");
           
           socket.on("FromSeq", (a) => {
@@ -75,7 +85,9 @@ function main(){
 
           socket.on("2Seq", (a) => {
             console.log("2Seq", a);
+            stack = [...stack, a];
             channel.publish(exchange, key2, Buffer.from(JSON.stringify(a)));
+            socket.emit("StackGestion", stack);
           });
 
           //Called when the client disconnect from the socketio link

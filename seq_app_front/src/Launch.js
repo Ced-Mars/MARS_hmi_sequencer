@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Button from '@mui/material/Button';
+import { FormControlLabel, FormControl, Switch, Button } from "@mui/material";
 
 import socketIOClient from "socket.io-client";
-import { FormControl } from "@mui/material";
 
 const ENDPOINT = "http://127.0.0.1:4002";
 const socket = socketIOClient(ENDPOINT);
@@ -17,6 +16,7 @@ export default function Launch(){
     const [reference, setReference] = React.useState([]); // tableau de string reference des elements cible pour le test, soit EN6115V3-4 soit ASNA2392-3-04 
     const [location, setLocation] = React.useState(false); // si element type fastener, permet de rajouter la location du fastener (optional)
     const [locationid, setLocationId] = React.useState([]); // tableau de int, id des rail ciblés
+    const [choice, setChoice] = React.useState(false);
 
   const handleChangeActionType = (event) => {
       if(event.target.value == "work"){
@@ -44,6 +44,9 @@ export default function Launch(){
     setLocationId(val);
   };
 
+/*   "actionType": "work",
+  "element": "fasterner", */
+
     const handleExe = () => {
         if(location == false){
             var data = {
@@ -65,6 +68,19 @@ export default function Launch(){
         socket.emit("FromSeq", data);
     };
 
+    
+    const handleExeGlobal = () => {
+        var data = {
+            "actionType": "work",
+            "element": "fastener",
+        }
+        socket.emit("FromSeq", data);
+    };
+
+    const handleChange = () => {
+        setChoice(!choice);
+    };
+
     useEffect(() => {
         socket.on("FromSeq", (a) => {
           setResponse(a);
@@ -83,47 +99,29 @@ export default function Launch(){
 
     return(
         <div>
-            
-            <form>
-
+            <form style={{display:"flex", flexDirection:"column"}}>
+                <FormControlLabel 
+                disabled 
+                control={
+                <Switch color="primary" onChange={handleChange}>
+                    checked={choice}
+                </Switch>} 
+                label={!choice ? "Génération Build Process à la volée" : "Générer Build Process depuis fichier config" } />
+                {choice ?  
                 <FormControl>
-                   <label>
-                    Action Type : 
-                    <select value={actionType} onChange={handleChangeActionType}>
-                        <option value={null}>None</option>
-                        <option value="work">Work</option>
-                        <option value="approach">Approach</option>
-                        <option value="station">Sation</option>
-                    </select>
-                </label>
-                {!location ? <label>
-                    
-                    Id(s) : 
-                    <select multiple={true} value={id} onChange={handleChangeId}>
-                        <option value={null}>None</option>
-                        <option value={1}>1</option>
-                        <option value={2}>2</option>
-                        <option value={3}>3</option>
-                        <option value={4}>4</option>
-                        <option value={5}>5</option>
-                        <option value={6}>6</option>
-                    </select>
-                </label>
-                 : null}
-                
-                {location ? <label>
-                    Reference : 
-                    <select multiple={true} value={reference} onChange={handleChangeReference}>
-                        <option value={null}>None</option>
-                        <option value="EN6115V3-4">EN6115V3-4</option>
-                        <option value="ASNA2392-3-04">ASNA2392-3-04</option>
-                    </select>
-                </label> : null}
-                
-                { location ? 
+                    <label>
+                        Action Type : 
+                        <select value={actionType} onChange={handleChangeActionType}>
+                            <option value={null}>None</option>
+                            <option value="work">Work</option>
+                            <option value="approach">Approach</option>
+                            <option value="station">Sation</option>
+                        </select>
+                    </label>
+                    {!location ? 
                     <label>
                         Id(s) : 
-                        <select multiple={true} value={locationid} onChange={handleChangeLocationId}>
+                        <select multiple={true} value={id} onChange={handleChangeId}>
                             <option value={null}>None</option>
                             <option value={1}>1</option>
                             <option value={2}>2</option>
@@ -133,10 +131,39 @@ export default function Launch(){
                             <option value={6}>6</option>
                         </select>
                     </label>
-                    : null 
-                } 
+                    : null}
+                    {location ? <label>
+                        Reference : 
+                        <select multiple={true} value={reference} onChange={handleChangeReference}>
+                            <option value={null}>None</option>
+                            <option value="EN6115V3-4">EN6115V3-4</option>
+                            <option value="ASNA2392-3-04">ASNA2392-3-04</option>
+                        </select>
+                    </label> : null}
+                    { location ? 
+                        <label>
+                            Id(s) : 
+                            <select multiple={true} value={locationid} onChange={handleChangeLocationId}>
+                                <option value={null}>None</option>
+                                <option value={1}>1</option>
+                                <option value={2}>2</option>
+                                <option value={3}>3</option>
+                                <option value={4}>4</option>
+                                <option value={5}>5</option>
+                                <option value={6}>6</option>
+                            </select>
+                        </label>
+                : 
+                null 
+                }
                 <Button variant="contained" onClick={handleExe}>Exectuer Programme</Button>
                 </FormControl>
+            : 
+            <FormControl>
+                <Button variant="contained" onClick={handleExeGlobal}>Exectuer Programme</Button>
+            </FormControl>
+            }
+                
                 
             </form>
             <p>{response}</p>

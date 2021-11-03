@@ -41,9 +41,8 @@ export default function Dialogue(){
     };
 
     const handleMoreStack = () => {
-        setStack([...stack, action]);
         setActionRequested(false);
-        socket.emit("2Seq", "action finie");
+        socket.emit("2Seq", action);
     };
 
     const handleActionRequested = () => {
@@ -53,9 +52,11 @@ export default function Dialogue(){
 
     useEffect(() => {
         socket.on("AlertSeq", (a) => {
-            console.log("inside alert seq useeffect");
             setAction(a);
             handleActionRequested();
+        });
+        socket.on("StackGestion", (a) => {
+            setStack(a);
         });
         // CLEAN UP THE EFFECT
         return () => socket.disconnect();
