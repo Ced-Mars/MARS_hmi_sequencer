@@ -42,7 +42,7 @@ export default function Dialogue(){
 
     const handleMoreStack = () => {
         setActionRequested(false);
-        socket.emit("2Seq", action);
+        socket.emit("Stack", action);
     };
 
     const handleActionRequested = () => {

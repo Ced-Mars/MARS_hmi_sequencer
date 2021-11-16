@@ -27,11 +27,13 @@ main();
 //Calling main function in socketio-connection.js
 function main(){
   var stack = [];
+  var running = false;
   var exchange = 'sequencer';
   var key = 'action.cmd';
   var key2 = 'action.toseq';
   var key3 = 'action.touser';
   var key4 = 'buildp.reset';
+  var key5 = 'hmi.running';
   //Connexion to rabbitMQ server
   try {
     //Creating connection with rabbitMQ server
@@ -55,6 +57,7 @@ function main(){
           console.log(' [*] Waiting for user actions');
           channel.bindQueue(q.queue, exchange, key3);
           channel.bindQueue(q.queue, exchange, key4);
+          channel.bindQueue(q.queue, exchange, key5);
           channel.consume(q.queue, function(msg) {
             
             if(msg.fields.routingKey == key3){
@@ -64,6 +67,9 @@ function main(){
             }else if (msg.fields.routingKey == key4){
               stack = [];
               socket.emit("StackGestion", stack);
+            }else if (msg.fields.routingKey == key5){
+              running = JSON.parse(msg.content);
+              socket.emit("Process", running);
             }
           }, {
             noAck: true
@@ -74,20 +80,21 @@ function main(){
         //Connection avec socket.io pour communication avec le frontend
         const socket = io.on("connection", (socket) => {
           console.log("Client is connected");
-          socket.emit("FromSeq", message);
+          socket.emit("Connected", message);
           socket.emit("StackGestion", stack);
+          console.log("running : ", running);
+          socket.emit("Process", running);
           console.log("emitted");
-          
-          socket.on("FromSeq", (a) => {
-            console.log("FromSeq", a);
-            channel.publish(exchange, key, Buffer.from(JSON.stringify(a)));
-          });
 
           socket.on("2Seq", (a) => {
-            console.log("2Seq", a);
+            channel.publish(exchange, key, Buffer.from(JSON.stringify(a)));
+            channel.publish(exchange, key4, Buffer.from(JSON.stringify(a)));
+          });
+
+          socket.on("Stack", (a) => {
             stack = [...stack, a];
-            channel.publish(exchange, key2, Buffer.from(JSON.stringify(a)));
             socket.emit("StackGestion", stack);
+            
           });
 
           //Called when the client disconnect from the socketio link

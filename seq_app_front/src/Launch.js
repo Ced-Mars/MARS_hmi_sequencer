@@ -17,6 +17,7 @@ export default function Launch(){
     const [location, setLocation] = React.useState(false); // si element type fastener, permet de rajouter la location du fastener (optional)
     const [locationid, setLocationId] = React.useState([]); // tableau de int, id des rail ciblés
     const [choice, setChoice] = React.useState(false);
+    const [running, setRunning] = React.useState(false);
 
   const handleChangeActionType = (event) => {
       if(event.target.value == "work"){
@@ -65,7 +66,7 @@ export default function Launch(){
                 }
             };
         };
-        socket.emit("FromSeq", data);
+        socket.emit("2Seq", data);
     };
 
     
@@ -74,7 +75,7 @@ export default function Launch(){
             "actionType": "work",
             "element": "fastener",
         }
-        socket.emit("FromSeq", data);
+        socket.emit("2Seq", data);
     };
 
     const handleChange = () => {
@@ -82,8 +83,11 @@ export default function Launch(){
     };
 
     useEffect(() => {
-        socket.on("FromSeq", (a) => {
+        socket.on("Connected", (a) => {
           setResponse(a);
+        });
+        socket.on("Process", (a) => {
+            setRunning(a);
         });
         return () => socket.disconnect();
       }, [socket]);
@@ -95,7 +99,6 @@ export default function Launch(){
             } 
         }
       }, [response]);
-
 
     return(
         <div>
@@ -160,7 +163,7 @@ export default function Launch(){
                 </FormControl>
             : 
             <FormControl>
-                <Button variant="contained" onClick={handleExeGlobal}>Exectuer Programme</Button>
+                <Button variant="contained" onClick={handleExeGlobal} disabled={running}>{running? "Process En Cours" : "Execute Program"}</Button>
             </FormControl>
             }
                 
