@@ -46,21 +46,31 @@ export default function Dialogue(){
     };
 
     const handleActionRequested = () => {
-        setActionRequested(true);
         setOpen(true);
     };
 
     useEffect(() => {
         socket.on("AlertSeq", (a) => {
             setAction(a);
-            handleActionRequested();
         });
         socket.on("StackGestion", (a) => {
             setStack(a);
         });
+        socket.on("ActionReqHandling", (a) => {
+            setActionRequested(a);
+        });
+        socket.on("RetrieveActionToExecute", (a) => {
+            setAction(a);
+        });
         // CLEAN UP THE EFFECT
         return () => socket.disconnect();
       }, [socket]);
+
+      useEffect(() => {
+          if(actionRequested == true){
+            handleActionRequested();
+          }
+      }, [actionRequested]);
     
     return(
         <div style={root}>
