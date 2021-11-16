@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { FormControlLabel, FormControl, Switch, Button } from "@mui/material";
 
-import socketIOClient from "socket.io-client";
-
-const ENDPOINT = "http://127.0.0.1:4002";
-const socket = socketIOClient(ENDPOINT);
-
-
+import io from "socket.io-client";
 
 export default function Launch(){
+    const ENDPOINT = "http://127.0.0.1:4002";
+    const [socket, setSocket] = useState(null);
     const [response, setResponse] = useState("En attente connexion backend");
     const [actionType, setActionType] = React.useState(''); // type d'action (mandatory)
     const [element, setElement] = React.useState(''); // type element ciblé (mandatory)
@@ -18,6 +15,11 @@ export default function Launch(){
     const [locationid, setLocationId] = React.useState([]); // tableau de int, id des rail ciblés
     const [choice, setChoice] = React.useState(false);
     const [running, setRunning] = React.useState(false);
+
+    useEffect(() => {
+        setSocket(io(ENDPOINT));
+        return () => io(ENDPOINT).close();
+      }, []);
 
   const handleChangeActionType = (event) => {
       if(event.target.value == "work"){
@@ -45,8 +47,6 @@ export default function Launch(){
     setLocationId(val);
   };
 
-/*   "actionType": "work",
-  "element": "fasterner", */
 
     const handleExe = () => {
         if(location == false){
@@ -83,18 +83,20 @@ export default function Launch(){
     };
 
     useEffect(() => {
-        socket.on("Connected", (a) => {
-          setResponse(a);
-        });
-        socket.on("Process", (a) => {
-            setRunning(a);
-        });
-        return () => socket.disconnect();
+        if(socket){
+            socket.on("Connected", (a) => {
+                setResponse(a);
+            });
+            socket.on("Process", (a) => {
+                  setRunning(a);
+            });
+            return () => socket.disconnect();
+        }
       }, [socket]);
 
       useEffect(() => {
         if(response == "En attente connexion backend"){
-            if(socket.connected == false){
+            if(socket && socket.connected == false){
                 socket.connect();
             } 
         }

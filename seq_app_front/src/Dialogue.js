@@ -2,12 +2,17 @@ import React, { useEffect, useState } from "react";
 import Button from '@mui/material/Button';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Stack, Alert } from "@mui/material";
 
-import socketIOClient from "socket.io-client";
-
-const ENDPOINT = "http://127.0.0.1:4002";
-const socket = socketIOClient(ENDPOINT);
+import io from "socket.io-client";
 
 export default function Dialogue(){
+    const ENDPOINT = "http://127.0.0.1:4002";
+    const [socket, setSocket] = useState(null);
+
+    useEffect(() => {
+        setSocket(io(ENDPOINT));
+        return () => io(ENDPOINT).close();
+    }, []);
+
     const root = {
         flex:1,
         width: "100%",
@@ -50,6 +55,7 @@ export default function Dialogue(){
     };
 
     useEffect(() => {
+    if(socket){
         socket.on("AlertSeq", (a) => {
             setAction(a);
         });
@@ -64,6 +70,7 @@ export default function Dialogue(){
         });
         // CLEAN UP THE EFFECT
         return () => socket.disconnect();
+        }
       }, [socket]);
 
       useEffect(() => {
