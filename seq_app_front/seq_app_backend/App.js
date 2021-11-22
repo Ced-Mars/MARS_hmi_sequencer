@@ -30,12 +30,12 @@ function main(){
   var actionRequested = false;
   var running = false;
   var action = {};
-  var exchange = 'sequencer';
-  var key = 'action.cmd';
-  var key2 = 'action.toseq';
-  var key3 = 'action.touser';
-  var key4 = 'buildp.reset';
-  var key5 = 'hmi.running';
+  var exchange = 'mars';
+  var key = 'hmi.sequencer.request';
+  var key2 = 'hmi.sequencer.report';
+  var key3 = 'sequencer.request.hmi';
+  var key4 = 'hmi.process.reset';
+  var key5 = 'sequencer.report.process.status';
   //Connexion to rabbitMQ server
   try {
     //Creating connection with rabbitMQ server
@@ -72,8 +72,14 @@ function main(){
               stack = [];
               socket.emit("StackGestion", stack);
             }else if (msg.fields.routingKey == key5){
-              running = JSON.parse(msg.content);
-              socket.emit("Process", running);
+              message = JSON.parse(msg.content);
+              if(message["id"] == "begin"){
+                running = true;
+                socket.emit("Process", running);
+              }else if(message["id"] == "end"){
+                running = false;
+                socket.emit("Process", running);
+              }
             }
           }, {
             noAck: true
