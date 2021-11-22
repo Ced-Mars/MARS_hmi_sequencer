@@ -9,6 +9,7 @@ export default function Dialogue(){
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
+        console.log("dans useeffect dialogue setting socket");
         setSocket(io(ENDPOINT));
         return () => io(ENDPOINT).close();
     }, []);
@@ -56,6 +57,9 @@ export default function Dialogue(){
 
     useEffect(() => {
     if(socket){
+        socket.on("connect", () => {
+            console.log("socket id dialogue", socket.id); // "G5p5..."
+        });
         socket.on("AlertSeq", (a) => {
             setAction(a);
         });

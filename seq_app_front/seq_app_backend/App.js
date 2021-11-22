@@ -84,7 +84,6 @@ function main(){
         //Connection avec socket.io pour communication avec le frontend
         const socket = io.on("connection", (socket) => {
           console.log("Client is connected");
-          socket.emit("Connected", message);
           socket.emit("StackGestion", stack);
           socket.emit("ActionReqHandling", actionRequested);
           if(actionRequested){

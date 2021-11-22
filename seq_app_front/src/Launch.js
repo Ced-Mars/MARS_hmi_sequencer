@@ -84,8 +84,9 @@ export default function Launch(){
 
     useEffect(() => {
         if(socket){
-            socket.on("Connected", (a) => {
-                setResponse(a);
+            socket.on("connect", () => {
+                console.log("socket id", socket.id); // "G5p5..."
+                setResponse("Connected");
             });
             socket.on("Process", (a) => {
                   setRunning(a);
