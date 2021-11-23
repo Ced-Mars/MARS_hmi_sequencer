@@ -5,11 +5,12 @@ const index = require("./routes/index.js");
 
 const port = process.env.PORT || 4002;
 const app = express();
-app.use(index);
+//app.use(index);
+app.use(express.static("dist"));
 const server = http.createServer(app);
 const server_path = "amqp://localhost";
 
-app.use(express.static("dist"));
+
 //Global variables where are stored informations about the messaging server and the channel
 var message = "Connecté";
 

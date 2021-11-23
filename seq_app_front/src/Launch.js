@@ -3,7 +3,7 @@ import { FormControlLabel, FormControl, Switch, Button } from "@mui/material";
 
 import io from "socket.io-client";
 
-export default function Launch(){
+const Launch = (drawerState, setDrawerState) => {
     const ENDPOINT = "http://127.0.0.1:4002";
     const [socket, setSocket] = useState(null);
     const [response, setResponse] = useState("En attente connexion backend");
@@ -76,6 +76,9 @@ export default function Launch(){
             "element": "fastener",
         }
         socket.emit("2Seq", data);
+        if(drawerState){
+            drawerState.setDrawerState(!drawerState);
+        }
     };
 
     const handleChange = () => {
@@ -177,3 +180,5 @@ export default function Launch(){
         
     );
 }
+
+export default Launch;
