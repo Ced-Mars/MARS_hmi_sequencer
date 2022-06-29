@@ -12,8 +12,8 @@
     },
     "rabbitMQRouting": {
         "opts":[
-            { "header":{ "publisher" : "sequencer", "path" : "/sequencer/manipulation", "x-match": "all" }, "routing_key":"sequencer.request"}, 
-            { "header":{ "publisher" : "sequencer", "path" : "/sequencer/error", "x-match": "all" }, "routing_key":"sequencer.request"}, 
+            { "header":{ "publisher" : "sequencer", "path" : "/sequencer/manipulation", "x-match": "all" }, "routing_key":"request.hmi"}, 
+            { "header":{ "publisher" : "sequencer", "path" : "/sequencer/error", "x-match": "all" }, "routing_key":"request.hmi"}, 
             { "header":{ "publisher" : "build_processorHMI", "path" : "/hmi/reset", "x-match": "all" }, "routing_key":"hmi.update"}
         ]
     }

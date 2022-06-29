@@ -48,7 +48,7 @@ function configPicker(exchange, ch, q, dataToSend, config){
   switch(config){
     case "Receiver Mode":
       //Consume messages that has the same routing key defined in the binding
-      ch.consume(q.queue, (data) => handleRoutingServerData(data), {noAck: true});
+      ch.consume(q.queue, (data) => handleRoutingServerData(data, exchange, ch), {noAck: true});
       break;
     case "Sender Mode":
       //Calling handler for running a sequence
