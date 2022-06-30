@@ -108,7 +108,7 @@ export default function Dialogue(){
             : 
             <div style={blocInfo}>
                 
-                <Alert severity="warning">Action demandée - {action["description"]}</Alert>
+                <Alert severity="warning">Action demandée - {action["uid"]}</Alert>
                 <Button onClick={handleMoreStack}>
                     Valider
                 </Button>
